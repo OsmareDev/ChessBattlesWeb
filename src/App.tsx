@@ -1,5 +1,4 @@
 import './App.css'
-import GameCard from './Components/GameCard'
 import GameHand from './Components/GameHand'
 
 function App() {

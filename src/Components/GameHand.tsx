@@ -1,7 +1,7 @@
 import GameCard from "./GameCard"
 import "../Styles/GameHand.css"
 
-const SPACE_BETWEEN_CENTERS = 2;
+// const SPACE_BETWEEN_CENTERS = 2;
 const MAX_DEGREES = 30;
 const MAX_OFFSET = -3;
 
