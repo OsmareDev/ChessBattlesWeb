@@ -1,0 +1,33 @@
+.GameHandContainer {
+  width: 70vw;
+  height: 4vh;
+  /* background: black; */
+  border: 1px solid black;
+  position: absolute;
+  bottom: 4vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  gap: 0.5vw;
+}
+
+.GameHandCardPosition {
+  border: 1px solid red;
+  min-width: 6vw;
+  width: 6vw;
+  height: 50vh;
+
+  display: flex;
+  align-items: end;
+  justify-content: center;
+}
+
+.GameHandCardPivot {
+  width: 100%;
+  height: 0%;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  position: absolute;
+}
