@@ -10,6 +10,8 @@
   justify-content: center;
   align-items: end;
   gap: 0.5vw;
+  
+  transition: all 0.5s ease;
 }
 
 .GameHandCardPosition {
@@ -21,6 +23,8 @@
   display: flex;
   align-items: end;
   justify-content: center;
+
+  transition: all 0.5s ease;
 }
 
 .GameHandCardPivot {
@@ -30,4 +34,6 @@
   align-items: end;
   justify-content: center;
   position: absolute;
+
+  transition: all 0.5s ease;
 }
