@@ -8,7 +8,7 @@
   justify-content: center;
 
   transition: all 0.3s ease;
-  animation: Spin 0.5s normal;
+  /* animation: Spin 0.5s normal; */
 }
 
 .GameCardFront {

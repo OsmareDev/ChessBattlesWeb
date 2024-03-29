@@ -15,16 +15,16 @@
 }
 
 .GameHandCardPosition {
-  border: 1px solid red;
+  /* border: 1px solid red; */
   min-width: 6vw;
   width: 6vw;
-  height: 50vh;
+  height: 100vh;
 
   display: flex;
   align-items: end;
   justify-content: center;
 
-  transition: all 0.5s ease;
+  z-index: 20;
 }
 
 .GameHandCardPivot {
@@ -35,5 +35,9 @@
   justify-content: center;
   position: absolute;
 
-  transition: all 0.5s ease;
+  transition: all 0.2s ease;
+}
+
+.GameHandCardPivot:hover {
+  z-index: 100 !important;
 }
