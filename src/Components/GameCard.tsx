@@ -1,13 +1,17 @@
 import "../Styles/GameCard.css"
+import { CARD_ASPECT_RATIO } from "../Utils/Utils";
 
 const CIRCLE = "☆";
 
 interface PropTypes {
-  card : GameCardType
+  card : GameCardType,
+  // The height and width are relative to the screen width (vw)
+  cardWidth? : number
 }
 
 export default function GameCard({
-  card
+  card,
+  cardWidth = 12
 } : PropTypes) {
 
   const costArray = []
@@ -19,7 +23,12 @@ export default function GameCard({
   valueArray.push(<p key="life">{card.life}</p>)
 
   return <>
-    <div className="GameCardContainer">
+    <div className="GameCardContainer"
+      style={{
+        width: `${cardWidth}vw`,
+        height: `${CARD_ASPECT_RATIO * cardWidth}vw`
+      }}
+    >
       <div className="GameCardBack" />
       <div className="GameCardFront">
         <div className="GameCardBorder" />

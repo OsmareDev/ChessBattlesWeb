@@ -1,0 +1,9 @@
+.GameDeckContainer {
+  position: absolute;
+
+  display: flex;
+  justify-content: center;
+  align-items: end;
+
+  /* background: rgba(255, 0, 0, 0.1); */
+}

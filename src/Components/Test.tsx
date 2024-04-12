@@ -12,11 +12,6 @@ const repos = (arr : cosaTipo[]) => {
   })
 }
 
-const shift = (arr : cosaTipo[]) => {
-  const last = arr.pop()
-  if (last) arr.unshift(last)
-}
-
 export default function Test() {
   const [ids, setIds] = useState<cosaTipo[]>([]);
 

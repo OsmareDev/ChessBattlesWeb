@@ -17,3 +17,19 @@ interface CardInHand {
   zInd: number;
   isBeingDragged: boolean;
 }
+
+interface GameHandAtributes {
+  maxDegrees : number;
+  maxOffsetY : number;
+  offsetByCard : number;
+  maxCardsInHand : number;
+}
+
+interface GameDeckAtributes {
+  offsetX : number;
+  offsetY : number;
+}
+
+interface DeckTest {
+  cards : GameCardType[]
+}
