@@ -1,10 +1,10 @@
 import { useRef } from "react"
 
-export default function useDeckCards( initialDeck : DeckTest, initialAtributes : GameDeckAtributes ) {
+export default function useDeckCards( initialDeck : DeckTest, initialAtributes : GameDeckAtributes, deckId : string ) {
   const deck = useRef<DeckTest>(initialDeck)
   const topCard = useRef<CardInHand | null>({
     card: initialDeck.cards[0],
-    id: initialDeck.cards.length.toString(),
+    id: deckId + initialDeck.cards.length.toString(),
     isBeingDragged: false,
     posX: initialAtributes.offsetX,
     posY: initialAtributes.offsetY,
@@ -23,7 +23,7 @@ export default function useDeckCards( initialDeck : DeckTest, initialAtributes :
 
     topCard.current = {
       card: initialDeck.cards[0],
-      id: initialDeck.cards.length.toString(),
+      id: deckId + initialDeck.cards.length.toString(),
       isBeingDragged: false,
       posX: initialAtributes.offsetX,
       posY: initialAtributes.offsetY,

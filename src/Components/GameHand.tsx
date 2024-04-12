@@ -2,7 +2,7 @@ import GameCard from "./GameCard"
 import "../Styles/GameHand.css"
 import useHandCards from "../Hooks/useHandCards";
 import useDeckCards from "../Hooks/useDeckCards";
-import { deckTest } from "../Utils/DeckTest";
+import { deckTest, deckTest2 } from "../Utils/DeckTest";
 import GameDeck from "./GameDeck";
 
 interface propTypes {
@@ -17,7 +17,7 @@ interface propTypes {
 }
 
 export default function GameHand({
-  initialNumberOfCards = 11,
+  // initialNumberOfCards = 11,
   maxCardsInHand = 7,
   maxDegrees = 30,
   maxOffsetY = -2,
@@ -26,8 +26,9 @@ export default function GameHand({
   cardGrowthRespectContainer = 2,
   bottom = 4
 } : propTypes) {
-  const { handleDragStart, handleDragOver, handleDrop, addNewCard, cardList, cardMoving, currentIndex } = useHandCards({maxDegrees, maxOffsetY, offsetByCard : cardContainerLenght + cardsContainerGap, maxCardsInHand})
-  const { loadNextCard, topCard } = useDeckCards( deckTest, { offsetX : 40, offsetY : 0 } )
+  const { handleDragStart, handleDragOver, handleDrop, addNewCard, addNewCardLeft, cardList, cardMoving, currentIndex } = useHandCards({maxDegrees, maxOffsetY, offsetByCard : cardContainerLenght + cardsContainerGap, maxCardsInHand})
+  const { loadNextCard, topCard } = useDeckCards( deckTest, { offsetX : 40, offsetY : 0 }, "deck1" )
+  const { loadNextCard: loadNextCard2, topCard: topCard2 } = useDeckCards( deckTest2, { offsetX : -40, offsetY : 0 }, "deck2" )
 
   const cards = []
   const backs = []
@@ -82,12 +83,33 @@ export default function GameHand({
     )
   }
 
+  if (topCard2) {
+    cards.push(
+      <div className="GameHandCardPivot"
+          id={topCard2.id}
+          key={topCard2.id}
+          style={{
+            zIndex: topCard2.zInd,
+            transform: `TranslateX(${topCard2.posX}vw) TranslateY(${-topCard2.posY}vw) RotateZ(${(topCard2.isBeingDragged) ? 0 : topCard2.tilt}deg) RotateY(-180deg)`,
+          }}>
+            <GameCard card={topCard2.card} cardWidth={cardContainerLenght * cardGrowthRespectContainer} />
+        </div>
+    )
+  }
+
   // HANDLE NEW CARD
   const addCardToHand = () => {
     if (topCard === null) return
 
     addNewCard(topCard)
     loadNextCard()
+  }
+
+  const addCard2ToHand = () => {
+    if (topCard2 === null) return
+
+    addNewCardLeft(topCard2)
+    loadNextCard2()
   }
 
   return <>
@@ -105,6 +127,7 @@ export default function GameHand({
       }
       
       <GameDeck addCard={addCardToHand} offsetX={40} offsetY={0} deckWidth={cardContainerLenght * cardGrowthRespectContainer}/>
+      <GameDeck addCard={addCard2ToHand} offsetX={-40} offsetY={0} deckWidth={cardContainerLenght * cardGrowthRespectContainer}/>
     </div>
   </>
 }

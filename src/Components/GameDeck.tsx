@@ -1,6 +1,5 @@
 import "../Styles/GameDeck.css"
 import { CARD_ASPECT_RATIO } from "../Utils/Utils";
-import GameCard from "./GameCard"
 
 interface propTypes {
   deckWidth? : number;
@@ -21,8 +20,8 @@ export default function GameDeck({
       onClick={addCard}
       className="GameDeckContainer"
       style={{
-        width: `${deckWidth}vw`,
-        height: `${CARD_ASPECT_RATIO * deckWidth}vw`,
+        width: `${deckWidth + 0.1}vw`,
+        height: `${CARD_ASPECT_RATIO * (deckWidth + 0.1)}vw`,
         transform: `translate(${offsetX}vw, ${offsetY}vw)`
       }}
     >

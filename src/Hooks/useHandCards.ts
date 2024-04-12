@@ -1,25 +1,25 @@
 import { useEffect, useRef, useState } from "react"
 
-const repositionAllCards = (cards : CardInHand[], handAtributes : GameHandAtributes) => {
-  const cardNumber = cards.length
-  const max_offsetX = ((cardNumber-1) / 2) * handAtributes.offsetByCard
+// const repositionAllCards = (cards : CardInHand[], handAtributes : GameHandAtributes) => {
+//   const cardNumber = cards.length
+//   const max_offsetX = ((cardNumber-1) / 2) * handAtributes.offsetByCard
   
-  cards.forEach( (card) => {
-    const div = (cardNumber == 1) ? 1 : cardNumber - 1
+//   cards.forEach( (card) => {
+//     const div = (cardNumber == 1) ? 1 : cardNumber - 1
 
-    const inclination = (cardNumber == 1) ? 0 : -(handAtributes.maxDegrees/2) + handAtributes.maxDegrees * card.realPos / (cardNumber - 1)
-    const offsetX = -(max_offsetX) + (max_offsetX * 2) * card.realPos / div
-    const offsetY = handAtributes.maxOffsetY * Math.pow(Math.abs(Math.floor(card.realPos - (cardNumber-1)/2)), 2) / Math.pow(div/2, 2)
-    const zIndex = 10 + card.realPos
+//     const inclination = (cardNumber == 1) ? 0 : -(handAtributes.maxDegrees/2) + handAtributes.maxDegrees * card.realPos / (cardNumber - 1)
+//     const offsetX = -(max_offsetX) + (max_offsetX * 2) * card.realPos / div
+//     const offsetY = handAtributes.maxOffsetY * Math.pow(Math.abs(Math.floor(card.realPos - (cardNumber-1)/2)), 2) / Math.pow(div/2, 2)
+//     const zIndex = 10 + card.realPos
 
-    card.posX = offsetX
-    card.posY = offsetY
-    card.tilt = inclination
-    card.zInd = zIndex
+//     card.posX = offsetX
+//     card.posY = offsetY
+//     card.tilt = inclination
+//     card.zInd = zIndex
 
-    console.log(max_offsetX);
-  })
-}
+//     console.log(max_offsetX);
+//   })
+// }
 
 const resetCardPosition = (card : CardInHand) => {
   card.posX = 0
@@ -27,6 +27,8 @@ const resetCardPosition = (card : CardInHand) => {
   card.tilt = 0
   card.zInd = 0
 }
+
+const shiftAllCards = (cards : CardInHand[]) => cards.forEach( card => card.realPos++ )
 
 const repositionCards = (cards : CardInHand[], handAtributes : GameHandAtributes, currentIndex : number) => {
   const numberOfCards = (cards.length > handAtributes.maxCardsInHand - 1) ? handAtributes.maxCardsInHand : cards.length
@@ -179,5 +181,17 @@ export default function useHandCards( initialAtributes : GameHandAtributes ) {
     setNewCardList( newCardList )
   }
 
-  return {handleDragStart, handleDragOver, handleDrop, addNewCard, cardList, cardMoving, currentIndex : currentIndex.current}
+  const addNewCardLeft = ( newCard : CardInHand ) => {
+    const newCardList = structuredClone(cardList)
+    
+    shiftAllCards(newCardList)
+    newCard.realPos = 0
+
+    newCardList.push(newCard)
+
+    repositionCards( newCardList, initialAtributes, currentIndex.current )
+    setNewCardList( newCardList )
+  }
+
+  return {handleDragStart, handleDragOver, handleDrop, addNewCard, addNewCardLeft, cardList, cardMoving, currentIndex : currentIndex.current}
 }
