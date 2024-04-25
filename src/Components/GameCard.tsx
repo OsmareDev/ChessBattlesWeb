@@ -10,8 +10,9 @@ interface PropTypes {
   cardWidth? : number;
   rotation? : number;
   active? : boolean;
+  disabled? : boolean;
   onClick? : () => void;
-  handleDiscard? : () => void
+  handleDiscard? : () => void;
 }
 
 export default function GameCard({
@@ -19,6 +20,7 @@ export default function GameCard({
   cardWidth = 12,
   rotation = 0,
   active = false,
+  disabled = false,
   onClick = () => {},
   handleDiscard = () => {}
 } : PropTypes) {
@@ -37,7 +39,8 @@ export default function GameCard({
       style={{
         width: `${cardWidth}vw`,
         height: `${CARD_ASPECT_RATIO * cardWidth}vw`,
-        transform: (active) ? "translateY(-2vw)" : ""
+        transform: (active) ? "translateY(-2vw)" : "",
+        pointerEvents: (disabled) ? "none" : "all"
       }}
     >
       <div 

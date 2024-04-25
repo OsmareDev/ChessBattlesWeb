@@ -46,7 +46,6 @@ export default function useHandCards( initialAtributes : GameHandAtributes ) {
   }, [cardList])
 
   const changeCardState = (id : number) => {
-
     const renewedList = structuredClone(cardList)
     renewedList[id].active = !renewedList[id].active
 
@@ -54,7 +53,8 @@ export default function useHandCards( initialAtributes : GameHandAtributes ) {
   }
 
   const handleDragStart = (e : React.DragEvent<HTMLDivElement>, index : number) => {
-    
+    if (cardList[index].discarded) return
+
     const renewedList = structuredClone(cardList)
     setNewCardList(renewedList)
 

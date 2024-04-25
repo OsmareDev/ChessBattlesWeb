@@ -74,6 +74,7 @@ export default function GameHand({
             active={cardList[i].active} 
             onClick={ () => (cardList[i].discarded) ? recoverCard(i) : changeCardState(i) } 
             handleDiscard={ () => discard(i) }
+            disabled={(Math.abs(cardList[i].tilt) == 90)}
           />
       </div>
     );
