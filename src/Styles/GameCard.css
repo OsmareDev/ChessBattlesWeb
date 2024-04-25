@@ -23,7 +23,10 @@
   justify-content: center;
 
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   transform: rotateY(0deg);
+  
+  transition: all 0.3s ease;
 }
 
 .GameCardBack {
@@ -35,6 +38,9 @@
   border-radius: 0.7vw;
   position: absolute;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  
+  transition: all 0.3s ease;
 }
 
 .GameCardExplication {
@@ -80,6 +86,21 @@
 
 .GameCardContainer:hover .GameCardExplication {
   opacity: 1;
+}
+
+.GameCardUsage {
+  width: 90%;
+  height: 25%;
+  position: absolute;
+  top: -27%;
+  background-color: black;
+  border-radius: 0.5vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2%;
+
+  transition: all 0.5s ease;
 }
 
 .GameCardBorder {
@@ -169,6 +190,26 @@
   display: flex;
   align-items: start;
   justify-content: center;
+}
+
+.GameCardButton {
+  width: 30%;
+  height: 80%;
+  border: 1px solid white;
+  border-radius: 0.5vw;
+  background-color: black;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: all 0.3s ease;
+}
+
+.GameCardButton:hover {
+  background: white;
+  color: black;
 }
 
 @keyframes Spin {

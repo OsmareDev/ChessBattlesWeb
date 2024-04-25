@@ -6,7 +6,7 @@ export const deckTest : DeckTest =  {
       description: "test 1",
       imageURL: "",
       life: 1,
-      name: "test name"
+      name: "test name",
     },
     {
       attack: 2,

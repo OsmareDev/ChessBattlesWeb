@@ -16,6 +16,8 @@ interface CardInHand {
   tilt: number;
   zInd: number;
   isBeingDragged: boolean;
+  active: boolean;
+  discarded: boolean;
 }
 
 interface GameHandAtributes {
@@ -23,6 +25,7 @@ interface GameHandAtributes {
   maxOffsetY : number;
   offsetByCard : number;
   maxCardsInHand : number;
+  discardedCardsY : number;
 }
 
 interface GameDeckAtributes {

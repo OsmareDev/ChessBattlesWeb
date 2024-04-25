@@ -10,7 +10,9 @@ export default function useDeckCards( initialDeck : DeckTest, initialAtributes :
     posY: initialAtributes.offsetY,
     realPos: 0,
     tilt: 0,
-    zInd: 0
+    zInd: 0,
+    active: false,
+    discarded: false
   })
 
   const loadNextCard = () => {
@@ -29,7 +31,9 @@ export default function useDeckCards( initialDeck : DeckTest, initialAtributes :
       posY: initialAtributes.offsetY,
       realPos: 0,
       tilt: 0,
-      zInd: 0
+      zInd: 0,
+      active: false,
+      discarded: false
     }
   }
 
