@@ -107,18 +107,11 @@ export const repositionCards = (cards : CardInHand[], handAtributes : GameHandAt
         resetCardPosition( card )
       } else {
         const currentPos = card.realPos - currentIndex
-
-        console.log("currentPos : ", currentPos)
         
         const inclination = -(handAtributes.maxDegrees/2) + handAtributes.maxDegrees * currentPos / (numberOfCards - 1)
         const offsetX = -(max_offsetX) + (max_offsetX * 2) * currentPos / (numberOfCards - 1)
         const offsetY = max_offsetY * Math.pow(Math.floor(Math.abs(currentPos - (numberOfCards - 1)/2)), 2) / Math.pow((numberOfCards - 1)/2, 2)
         const zIndex = 10 + card.realPos
-
-        console.log("inclination : ", inclination)
-        console.log("offsetX : ", offsetX)
-        console.log("offsetY : ", offsetY)
-        console.log("zIndex : ", zIndex)
 
         card.posX = offsetX
         card.posY = offsetY

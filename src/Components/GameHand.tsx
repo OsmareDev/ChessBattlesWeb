@@ -34,7 +34,7 @@ export default function GameHand({
   const cards = []
   const backs = []
 
-  const length = (cardList.length > maxCardsInHand - discardedCards) ? maxCardsInHand : cardList.length - discardedCards
+  const length = (cardList.length - discardedCards > maxCardsInHand) ? maxCardsInHand : cardList.length - discardedCards
   for (let i = 0; i < length; ++i) {
     backs.push(
       <div 

@@ -87,7 +87,9 @@ export default function useHandCards( initialAtributes : GameHandAtributes ) {
   const addNewCard = ( newCard : CardInHand ) => {
     const newCardList = structuredClone(cardList)
     
-    newCard.realPos = cardList.length
+    newCard.realPos = newCardList.length - numberOfDiscardedCards.current
+    console.log("new Card Position : ", newCard.realPos)
+    shiftAllCards(newCardList, cardList.length - numberOfDiscardedCards.current, false)
 
     newCardList.push(newCard)
 
