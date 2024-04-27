@@ -1,24 +1,3 @@
-// const repositionAllCards = (cards : CardInHand[], handAtributes : GameHandAtributes) => {
-//   const cardNumber = cards.length
-//   const max_offsetX = ((cardNumber-1) / 2) * handAtributes.offsetByCard
-  
-//   cards.forEach( (card) => {
-//     const div = (cardNumber == 1) ? 1 : cardNumber - 1
-
-//     const inclination = (cardNumber == 1) ? 0 : -(handAtributes.maxDegrees/2) + handAtributes.maxDegrees * card.realPos / (cardNumber - 1)
-//     const offsetX = -(max_offsetX) + (max_offsetX * 2) * card.realPos / div
-//     const offsetY = handAtributes.maxOffsetY * Math.pow(Math.abs(Math.floor(card.realPos - (cardNumber-1)/2)), 2) / Math.pow(div/2, 2)
-//     const zIndex = 10 + card.realPos
-
-//     card.posX = offsetX
-//     card.posY = offsetY
-//     card.tilt = inclination
-//     card.zInd = zIndex
-
-//     console.log(max_offsetX);
-//   })
-// }
-
 export const resetCardPosition = (card : CardInHand) => {
   card.posX = 0
   card.posY = 0
@@ -26,105 +5,122 @@ export const resetCardPosition = (card : CardInHand) => {
   card.zInd = 0
 }
 
-export const shiftAllCards = (cards : CardInHand[], from : number, left : boolean) => cards.forEach( card =>  { if (card.realPos >= from) card.realPos += (left) ? -1 : 1 } )
+// export const shiftAllCards = (cards : CardInHand[], from : number, left : boolean) => cards.forEach( card =>  { if (card.realPos >= from) card.realPos += (left) ? -1 : 1 } )
 
-export const shiftCard = (cards : CardInHand[], from : number, to :number) => {
-  const displacementDirection = Math.sign(from - to)
+// export const shiftCard = (cards : CardInHand[], from : number, to :number) => {
+//   const displacementDirection = Math.sign(from - to)
   
-  cards.forEach( card => { 
-    if (displacementDirection > 0) {
-      if (card.realPos < from && card.realPos >= to)  {
-        card.realPos++
-      }
-      else if (card.realPos == from) card.realPos = to
-    } else {
-      if (card.realPos > from && card.realPos <= to)  {
-        card.realPos--
-      }
-      else if (card.realPos == from) card.realPos = to
-    }
-  })
-}
+//   cards.forEach( card => { 
+//     if (displacementDirection > 0) {
+//       if (card.realPos < from && card.realPos >= to)  {
+//         card.realPos++
+//       }
+//       else if (card.realPos == from) card.realPos = to
+//     } else {
+//       if (card.realPos > from && card.realPos <= to)  {
+//         card.realPos--
+//       }
+//       else if (card.realPos == from) card.realPos = to
+//     }
+//   })
+// }
 
-export const repositionCards = (cards : CardInHand[], handAtributes : GameHandAtributes, currentIndex : number, cardsDiscarded : number) => {
-  const numberOfCards = (cards.length - cardsDiscarded > handAtributes.maxCardsInHand - 1) ? handAtributes.maxCardsInHand : cards.length - cardsDiscarded
+export const repositionCards = (cards : CardInHand[], handAtributes : GameHandAtributes, currentIndex : number) => {
+  if (cards.length == 1) {
+    resetCardPosition( cards[0] )
+    return
+  }
+  const numberOfCards = (cards.length > handAtributes.maxCardsInHand - 1) ? handAtributes.maxCardsInHand : cards.length
 
   const max_offsetX = (( numberOfCards - 1 ) / 2) * handAtributes.offsetByCard
   const max_offsetY = ( handAtributes.maxOffsetY * numberOfCards / handAtributes.maxCardsInHand )
 
-  
-
-  cards.forEach( card => {
-    if (card.realPos < currentIndex) {
-      const currentPos = (card.realPos - (currentIndex))
-
-      const inclination = -90
-      const offsetX = -max_offsetX - handAtributes.offsetByCard
-      const offsetY = max_offsetY * Math.pow(Math.floor(Math.abs(currentPos - (numberOfCards - 1)/2)), 2) / Math.pow((numberOfCards - 1)/2, 2)
-      const zIndex = 10 + card.realPos
-
-      card.posX = offsetX
-      card.posY = offsetY
-      card.tilt = inclination
-      card.zInd = zIndex
-      card.active = false
+  cards.forEach( (card, index) => {
+    if (index < currentIndex) {
+      repositionPreCard(card, index, currentIndex, max_offsetX, max_offsetY, handAtributes, numberOfCards)
     }
 
-    else if (card.realPos >= currentIndex + handAtributes.maxCardsInHand || card.discarded) {
-      if (card.discarded) {
-        const currentPos = card.realPos - (cards.length - 1 - cardsDiscarded) - 1
-        const maxofseto = (( cardsDiscarded - 1 ) / 2) * handAtributes.offsetByCard
-        const discardedCards = (cardsDiscarded > 1) ? cardsDiscarded : 2
-        
-        const inclination = 0
-        const offsetX = -(maxofseto) + (maxofseto * 2) * currentPos / (discardedCards - 1)
-        const offsetY = -handAtributes.discardedCardsY
-        const zIndex = 10 + card.realPos
-
-        card.posX = offsetX
-        card.posY = offsetY
-        card.tilt = inclination
-        card.zInd = zIndex
-        card.active = false
-      } else {
-        const currentPos = card.realPos - currentIndex
-
-        const inclination = 90
-        const offsetX = max_offsetX + handAtributes.offsetByCard
-        const offsetY = max_offsetY * Math.pow(Math.floor(Math.abs(currentPos - (numberOfCards - 1)/2)), 2) / Math.pow((numberOfCards - 1)/2, 2)
-        const zIndex = 10 + card.realPos
-
-        card.posX = offsetX
-        card.posY = offsetY
-        card.tilt = inclination
-        card.zInd = zIndex
-        card.active = false
-      }
+    else if (index >= currentIndex + handAtributes.maxCardsInHand) {
+      repositionPostCard(card, index, currentIndex, max_offsetX, max_offsetY, handAtributes, numberOfCards)
     }
 
     else {
-      if (numberOfCards === 1) {
-        resetCardPosition( card )
-      } else {
-        const currentPos = card.realPos - currentIndex
-        
-        const inclination = -(handAtributes.maxDegrees/2) + handAtributes.maxDegrees * currentPos / (numberOfCards - 1)
-        const offsetX = -(max_offsetX) + (max_offsetX * 2) * currentPos / (numberOfCards - 1)
-        const offsetY = max_offsetY * Math.pow(Math.floor(Math.abs(currentPos - (numberOfCards - 1)/2)), 2) / Math.pow((numberOfCards - 1)/2, 2)
-        const zIndex = 10 + card.realPos
-
-        card.posX = offsetX
-        card.posY = offsetY
-        card.tilt = inclination
-        card.zInd = zIndex
-      }
+      repositionHandCard(card, index, currentIndex, max_offsetX, max_offsetY, handAtributes, numberOfCards)
     }
   })
 }
 
+const repositionPreCard = ( card : CardInHand, index : number, currentIndex : number, max_offsetX : number, max_offsetY : number, handAtributes : GameHandAtributes, numberOfCards : number ) => {
+  const currentPos = (index - (currentIndex))
+
+  const inclination = -90
+  const offsetX = -max_offsetX - handAtributes.offsetByCard
+  const offsetY = max_offsetY * Math.pow(Math.floor(Math.abs(currentPos - (numberOfCards - 1)/2)), 2) / Math.pow((numberOfCards - 1)/2, 2)
+  const zIndex = 10 + index
+
+  card.posX = offsetX
+  card.posY = offsetY
+  card.tilt = inclination
+  card.zInd = zIndex
+  card.active = false
+}
+
+export const repositionHandCard = (card : CardInHand, index : number, currentIndex : number, max_offsetX : number, max_offsetY : number, handAtributes : GameHandAtributes, numberOfCards : number) => {
+  const currentPos = index - currentIndex
+        
+  const inclination = -(handAtributes.maxDegrees/2) + handAtributes.maxDegrees * currentPos / (numberOfCards - 1)
+  const offsetX = -(max_offsetX) + (max_offsetX * 2) * currentPos / (numberOfCards - 1)
+  const offsetY = max_offsetY * Math.pow(Math.floor(Math.abs(currentPos - (numberOfCards - 1)/2)), 2) / Math.pow((numberOfCards - 1)/2, 2)
+  const zIndex = 10 + index
+
+  card.posX = offsetX
+  card.posY = offsetY
+  card.tilt = inclination
+  card.zInd = zIndex
+}
+
+const repositionPostCard = (card : CardInHand, index : number, currentIndex : number, max_offsetX : number, max_offsetY : number, handAtributes : GameHandAtributes, numberOfCards : number) => {
+  const currentPos = index - currentIndex
+
+  const inclination = 90
+  const offsetX = max_offsetX + handAtributes.offsetByCard
+  const offsetY = max_offsetY * Math.pow(Math.floor(Math.abs(currentPos - (numberOfCards - 1)/2)), 2) / Math.pow((numberOfCards - 1)/2, 2)
+  const zIndex = 10 + index
+
+  card.posX = offsetX
+  card.posY = offsetY
+  card.tilt = inclination
+  card.zInd = zIndex
+  card.active = false
+}
+
+export const repositionDiscardedCards = ( discardedCards : CardInHand[], handAtributes : GameHandAtributes ) => {
+  discardedCards.forEach( (card, i) => {
+    const currentPos = i
+    const max_offsetX = (( discardedCards.length - 1 ) / 2) * handAtributes.offsetByCard
+    const nDiscardedCards = (discardedCards.length > 1) ? discardedCards.length : 2
+    
+    const inclination = 0
+    const offsetX = -(max_offsetX) + (max_offsetX * 2) * currentPos / (nDiscardedCards - 1)
+    const offsetY = -handAtributes.discardedCardsY
+    const zIndex = 10 + currentPos
+
+    card.posX = offsetX
+    card.posY = offsetY
+    card.tilt = inclination
+    card.zInd = zIndex
+    card.active = false
+  } )
+  
+}
+
 export const shiftValues = (cards : CardInHand[], index : number, wantedIndex : number) => {
-  const changeCard = cards.find(card => card.realPos == wantedIndex)
-  if (changeCard == null) return
-  changeCard.realPos = cards[index].realPos
-  cards[index].realPos = wantedIndex
+  const auxCard = structuredClone(cards[wantedIndex])
+  cards[wantedIndex] = structuredClone(cards[index])
+  cards[index] = auxCard
+  
+  // const changeCard = cards.find(card => card.realPos == wantedIndex)
+  // if (changeCard == null) return
+  // changeCard.realPos = cards[index].realPos
+  // cards[index].realPos = wantedIndex
 }

@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react"
-import { repositionCards, shiftAllCards, shiftCard, shiftValues } from "../Utils/HandCardUtils"
+import { repositionCards, repositionDiscardedCards, shiftValues } from "../Utils/HandCardUtils"
 
 let lastDraggedIndex : (number) = 0
-let pickedCardIndex : (number) = 0
 
 export default function useHandCards( initialAtributes : GameHandAtributes ) {
   const [cardList, setNewCardList] = useState<CardInHand[]>([])
@@ -10,7 +9,7 @@ export default function useHandCards( initialAtributes : GameHandAtributes ) {
   
   const cooldownScroll = useRef(false)
   const currentIndex = useRef(0)
-  const numberOfDiscardedCards = useRef(0)
+  const discardedCards = useRef<CardInHand[]>([])
 
   useEffect(() => {
     const handleScroll = (event : WheelEvent) => {
@@ -23,13 +22,13 @@ export default function useHandCards( initialAtributes : GameHandAtributes ) {
         currentIndex.current = 0
         return
       }
-      if (currentIndex.current + initialAtributes.maxCardsInHand > cardList.length - numberOfDiscardedCards.current) {
+      if (currentIndex.current + initialAtributes.maxCardsInHand > cardList.length) {
         currentIndex.current -= 1
         return
       }
 
       const newCardList = structuredClone(cardList)
-      repositionCards(newCardList, initialAtributes, currentIndex.current, numberOfDiscardedCards.current )
+      repositionCards(newCardList, initialAtributes, currentIndex.current )
       setNewCardList(newCardList)
       
       cooldownScroll.current = true
@@ -53,8 +52,6 @@ export default function useHandCards( initialAtributes : GameHandAtributes ) {
   }
 
   const handleDragStart = (e : React.DragEvent<HTMLDivElement>, index : number) => {
-    if (cardList[index].discarded) return
-
     const renewedList = structuredClone(cardList)
     setNewCardList(renewedList)
 
@@ -62,21 +59,32 @@ export default function useHandCards( initialAtributes : GameHandAtributes ) {
     e.dataTransfer.setDragImage(e.target as Element, window.outerWidth * 2, window.outerHeight * 2);
 
     lastDraggedIndex = index
-    pickedCardIndex = index
 
     setCardMoving(true)
   };
 
   const handleDragOver = (e : React.DragEvent<HTMLDivElement>, index : number) => {
     e.preventDefault();
-    if (cardList[lastDraggedIndex].realPos === index) return
+    if (lastDraggedIndex === index) return
     
-    const renewedList = structuredClone(cardList)
-    shiftValues( renewedList, pickedCardIndex, index )
-    repositionCards( renewedList, initialAtributes, currentIndex.current, numberOfDiscardedCards.current )
+    const newList = structuredClone(cardList)
+    shiftValues( newList, lastDraggedIndex, index )
+
+    // maybe will be more efficient to just reposition the two cards that moved
+    repositionCards( newList, initialAtributes, currentIndex.current )
     
-    setNewCardList( renewedList )
-    lastDraggedIndex = renewedList[index].realPos
+    setNewCardList( newList )
+    lastDraggedIndex = index
+
+    // if (cardList[lastDraggedIndex].realPos === index) return
+    
+    // const renewedList = structuredClone(cardList)
+    // shiftValues( renewedList, pickedCardIndex, index )
+    // repositionCards( renewedList, initialAtributes, currentIndex.current )
+    
+    // setNewCardList( renewedList )
+    // lastDraggedIndex = renewedList[index].realPos
+    
   }
   
   const handleDrop = (e : React.DragEvent<HTMLDivElement>) => {
@@ -86,61 +94,41 @@ export default function useHandCards( initialAtributes : GameHandAtributes ) {
 
   const addNewCard = ( newCard : CardInHand ) => {
     const newCardList = structuredClone(cardList)
-    
-    newCard.realPos = newCardList.length - numberOfDiscardedCards.current
-    console.log("new Card Position : ", newCard.realPos)
-    shiftAllCards(newCardList, cardList.length - numberOfDiscardedCards.current, false)
-
     newCardList.push(newCard)
 
-    repositionCards( newCardList, initialAtributes, currentIndex.current, numberOfDiscardedCards.current )
+    repositionCards( newCardList, initialAtributes, currentIndex.current )
     setNewCardList( newCardList )
   }
 
   const addNewCardLeft = ( newCard : CardInHand ) => {
     const newCardList = structuredClone(cardList)
-    
-    shiftAllCards(newCardList, 0, false)
-    newCard.realPos = 0
+    newCardList.unshift(newCard)
 
-    newCardList.push(newCard)
-
-    repositionCards( newCardList, initialAtributes, currentIndex.current, numberOfDiscardedCards.current )
+    repositionCards( newCardList, initialAtributes, currentIndex.current )
     setNewCardList( newCardList )
   }
 
   const discard = ( id : number ) => {
     const newCardList = structuredClone(cardList)
 
-    newCardList[id].active = false
-    newCardList[id].discarded = true
-    numberOfDiscardedCards.current++
-    
-    shiftAllCards( newCardList, newCardList[id].realPos, true )
-    newCardList[id].realPos = cardList.length - 1 
-    // newCardList.splice(id, 1)
+    const discardedCard = newCardList.splice(id, 1)
+    discardedCard[0].active = false
+
+    discardedCards.current.push(discardedCard[0])
     
     // Check if the index must be moved to have the maximum card count in the hand
-    if (currentIndex.current + initialAtributes.maxCardsInHand > newCardList.length - (1 + numberOfDiscardedCards.current) && currentIndex.current > 0) currentIndex.current--
-    repositionCards( newCardList, initialAtributes, currentIndex.current, numberOfDiscardedCards.current )
+    if (currentIndex.current + initialAtributes.maxCardsInHand > newCardList.length - (1 + discardedCards.current.length) && currentIndex.current > 0) currentIndex.current--
+    repositionCards( newCardList, initialAtributes, currentIndex.current )
+    repositionDiscardedCards( discardedCards.current, initialAtributes )
     
     setNewCardList( newCardList )
   }
 
   const recoverCard = ( id : number ) => {
-    const newCardList = structuredClone(cardList)
-
-    newCardList[id].discarded = false
-    numberOfDiscardedCards.current--
-
-    if (newCardList[id].realPos != cardList.length - 1 - numberOfDiscardedCards.current) {
-      shiftCard( newCardList, newCardList[id].realPos, cardList.length - 1 - numberOfDiscardedCards.current )
-    }
-
-    repositionCards( newCardList, initialAtributes, currentIndex.current, numberOfDiscardedCards.current )
-
-    setNewCardList( newCardList )
+    const recoveredCard = discardedCards.current.splice( id, 1 )
+    repositionDiscardedCards( discardedCards.current, initialAtributes )
+    addNewCard(recoveredCard[0])
   }
 
-  return {handleDragStart, handleDragOver, handleDrop, addNewCard, addNewCardLeft, changeCardState, discard, recoverCard, cardList, cardMoving, currentIndex : currentIndex.current, discardedCards : numberOfDiscardedCards.current}
+  return {handleDragStart, handleDragOver, handleDrop, addNewCard, addNewCardLeft, changeCardState, discard, recoverCard, cardList, cardMoving, currentIndex : currentIndex.current, discardedCards : discardedCards.current}
 }

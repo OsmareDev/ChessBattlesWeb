@@ -9,7 +9,7 @@ interface GameCardType {
 
 interface CardInHand {
   id: string;
-  realPos: number;
+  domPos: number;
   card: GameCardType;
   posX: number;
   posY: number;
@@ -17,7 +17,6 @@ interface CardInHand {
   zInd: number;
   isBeingDragged: boolean;
   active: boolean;
-  discarded: boolean;
 }
 
 interface GameHandAtributes {

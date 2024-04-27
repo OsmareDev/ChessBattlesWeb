@@ -1,6 +1,18 @@
 import { useRef } from "react"
+import { useDomController } from "./Stores/useDomController"
+
+// THIS SHOULD BE IN A GLOBAL STATE BUT THEN IT BECOMES THE PROBLEM OF BEING AN INFINITE LOOP
+let domPosition = 0
+
+function getNewDomPosition() {
+  const newDomPos = domPosition
+  domPosition++
+  return newDomPos
+}
 
 export default function useDeckCards( initialDeck : DeckTest, initialAtributes : GameDeckAtributes, deckId : string ) {
+  // const { getNewDomPosition } = useDomController()
+  
   const deck = useRef<DeckTest>(initialDeck)
   const topCard = useRef<CardInHand | null>({
     card: initialDeck.cards[0],
@@ -8,11 +20,11 @@ export default function useDeckCards( initialDeck : DeckTest, initialAtributes :
     isBeingDragged: false,
     posX: initialAtributes.offsetX,
     posY: initialAtributes.offsetY,
-    realPos: 0,
+    domPos: getNewDomPosition(),
+    // domPos: 0,
     tilt: 0,
     zInd: 0,
-    active: false,
-    discarded: false
+    active: false
   })
 
   const loadNextCard = () => {
@@ -29,11 +41,10 @@ export default function useDeckCards( initialDeck : DeckTest, initialAtributes :
       isBeingDragged: false,
       posX: initialAtributes.offsetX,
       posY: initialAtributes.offsetY,
-      realPos: 0,
+      domPos: getNewDomPosition(),
       tilt: 0,
       zInd: 0,
-      active: false,
-      discarded: false
+      active: false
     }
   }
 
