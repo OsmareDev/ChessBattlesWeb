@@ -14,9 +14,12 @@ interface CardInHand {
   posX: number;
   posY: number;
   tilt: number;
+  rotation : number;
+  scale : number;
   zInd: number;
   isBeingDragged: boolean;
   active: boolean;
+  inUse: boolean;
 }
 
 interface GameHandAtributes {
@@ -25,6 +28,10 @@ interface GameHandAtributes {
   offsetByCard : number;
   maxCardsInHand : number;
   discardedCardsY : number;
+  usingCardPos : {
+    x : number;
+    y : number;
+  }
 }
 
 interface GameDeckAtributes {

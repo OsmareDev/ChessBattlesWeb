@@ -1,6 +1,7 @@
 import "../Styles/GameCard.css"
 import { CARD_ASPECT_RATIO } from "../Utils/Utils";
 import { trash } from "../assets/trash.tsx"
+import { useSVG } from "../assets/use.tsx";
 
 const CIRCLE = "☆";
 
@@ -13,6 +14,7 @@ interface PropTypes {
   disabled? : boolean;
   onClick? : () => void;
   handleDiscard? : () => void;
+  handleUse? : () => void;
 }
 
 export default function GameCard({
@@ -22,7 +24,8 @@ export default function GameCard({
   active = false,
   disabled = false,
   onClick = () => {},
-  handleDiscard = () => {}
+  handleDiscard = () => {},
+  handleUse = () => {},
 } : PropTypes) {
 
   const costArray = []
@@ -67,7 +70,7 @@ export default function GameCard({
             pointerEvents: (active) ? "all" : "none"
           }}
         >
-          <button className="GameCardButton">A</button>
+          <button className="GameCardButton" onClick={ (e) => { handleUse(); e.stopPropagation(); }}>{ useSVG }</button>
           <button className="GameCardButton">B</button>
           <button className="GameCardButton" onClick={ (e) => { handleDiscard(); e.stopPropagation(); }}>{ trash }</button>
         </div>

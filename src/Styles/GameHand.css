@@ -44,3 +44,21 @@
 .GameHandCardPivot:hover {
   z-index: 100 !important;
 }
+
+.GenericButton {
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  padding: 2vw;
+  background: black;
+  color: white;
+  border: 2px solid white;
+  border-radius: 1vw;
+  letter-spacing: 0.1vw;
+}
+
+.GenericButton:hover {
+  background: white;
+  color: black;
+  cursor: pointer;
+}

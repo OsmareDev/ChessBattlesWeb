@@ -3,27 +3,9 @@ export const resetCardPosition = (card : CardInHand) => {
   card.posY = 0
   card.tilt = 0
   card.zInd = 0
+  card.rotation = 0
+  card.scale = 1
 }
-
-// export const shiftAllCards = (cards : CardInHand[], from : number, left : boolean) => cards.forEach( card =>  { if (card.realPos >= from) card.realPos += (left) ? -1 : 1 } )
-
-// export const shiftCard = (cards : CardInHand[], from : number, to :number) => {
-//   const displacementDirection = Math.sign(from - to)
-  
-//   cards.forEach( card => { 
-//     if (displacementDirection > 0) {
-//       if (card.realPos < from && card.realPos >= to)  {
-//         card.realPos++
-//       }
-//       else if (card.realPos == from) card.realPos = to
-//     } else {
-//       if (card.realPos > from && card.realPos <= to)  {
-//         card.realPos--
-//       }
-//       else if (card.realPos == from) card.realPos = to
-//     }
-//   })
-// }
 
 export const repositionCards = (cards : CardInHand[], handAtributes : GameHandAtributes, currentIndex : number) => {
   if (cards.length == 1) {
@@ -36,6 +18,8 @@ export const repositionCards = (cards : CardInHand[], handAtributes : GameHandAt
   const max_offsetY = ( handAtributes.maxOffsetY * numberOfCards / handAtributes.maxCardsInHand )
 
   cards.forEach( (card, index) => {
+    card.rotation = 0
+
     if (index < currentIndex) {
       repositionPreCard(card, index, currentIndex, max_offsetX, max_offsetY, handAtributes, numberOfCards)
     }
@@ -112,6 +96,24 @@ export const repositionDiscardedCards = ( discardedCards : CardInHand[], handAtr
     card.active = false
   } )
   
+}
+
+export const repositionPreparedCards = ( cardList : CardInHand[], handAtributes : GameHandAtributes ) => {
+  cardList.forEach( card => {
+    card.tilt = 0
+    card.active = false
+    
+    card.posX = (card.inUse) 
+      ? handAtributes.usingCardPos.x
+      : 0
+    card.posY = (card.inUse) 
+      ? handAtributes.usingCardPos.y
+      : -handAtributes.discardedCardsY
+
+    card.rotation = (card.inUse)
+      ? 720
+      : 180
+  })
 }
 
 export const shiftValues = (cards : CardInHand[], index : number, wantedIndex : number) => {

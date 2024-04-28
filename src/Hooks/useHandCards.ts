@@ -1,15 +1,20 @@
 import { useEffect, useRef, useState } from "react"
-import { repositionCards, repositionDiscardedCards, shiftValues } from "../Utils/HandCardUtils"
+import { repositionCards, repositionDiscardedCards, repositionPreparedCards, shiftValues } from "../Utils/HandCardUtils"
+import useBadDomController from "./useBadDomController"
 
 let lastDraggedIndex : (number) = 0
 
 export default function useHandCards( initialAtributes : GameHandAtributes ) {
   const [cardList, setNewCardList] = useState<CardInHand[]>([])
   const [cardMoving, setCardMoving] = useState(false)
+
+  const { resetDomPositions, getNewDomPosition } = useBadDomController()
   
   const cooldownScroll = useRef(false)
   const currentIndex = useRef(0)
   const discardedCards = useRef<CardInHand[]>([])
+  const usingCard = useRef<boolean>(false)
+
 
   useEffect(() => {
     const handleScroll = (event : WheelEvent) => {
@@ -94,6 +99,7 @@ export default function useHandCards( initialAtributes : GameHandAtributes ) {
 
   const addNewCard = ( newCard : CardInHand ) => {
     const newCardList = structuredClone(cardList)
+    newCard.rotation = 0
     newCardList.push(newCard)
 
     repositionCards( newCardList, initialAtributes, currentIndex.current )
@@ -102,6 +108,7 @@ export default function useHandCards( initialAtributes : GameHandAtributes ) {
 
   const addNewCardLeft = ( newCard : CardInHand ) => {
     const newCardList = structuredClone(cardList)
+    newCard.rotation = 0
     newCardList.unshift(newCard)
 
     repositionCards( newCardList, initialAtributes, currentIndex.current )
@@ -130,5 +137,53 @@ export default function useHandCards( initialAtributes : GameHandAtributes ) {
     addNewCard(recoveredCard[0])
   }
 
-  return {handleDragStart, handleDragOver, handleDrop, addNewCard, addNewCardLeft, changeCardState, discard, recoverCard, cardList, cardMoving, currentIndex : currentIndex.current, discardedCards : discardedCards.current}
+  const deleteCards = () => {
+    discardedCards.current = []
+    resetDomPositions()
+
+    const newCardList = structuredClone(cardList)
+    newCardList.forEach( card => {
+      card.domPos = getNewDomPosition()
+    })
+
+    setNewCardList(newCardList)
+  }
+
+  const prepareCard = ( index : number ) => {
+    const newCardList = structuredClone(cardList)
+    newCardList[index].inUse = !newCardList[index].inUse
+    console.log("entra")
+
+    if (newCardList[index].inUse) {
+      newCardList[index].scale = 1.5
+      repositionPreparedCards(newCardList, initialAtributes)
+      repositionPreparedCards(discardedCards.current, initialAtributes)
+    } else {
+      newCardList[index].scale = 1
+      repositionCards( newCardList, initialAtributes, currentIndex.current )
+      repositionDiscardedCards( discardedCards.current, initialAtributes )
+    }
+    
+    usingCard.current = !usingCard.current
+
+    setNewCardList(newCardList)
+  }
+
+  return {
+    handleDragStart, 
+    handleDragOver, 
+    handleDrop, 
+    addNewCard, 
+    addNewCardLeft, 
+    changeCardState, 
+    discard, 
+    recoverCard, 
+    deleteCards,
+    prepareCard,
+    cardList, 
+    cardMoving, 
+    currentIndex : currentIndex.current, 
+    discardedCards : discardedCards.current,
+    usingCard : usingCard.current,
+  }
 }

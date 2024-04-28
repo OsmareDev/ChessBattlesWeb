@@ -1,17 +1,9 @@
 import { useRef } from "react"
-import { useDomController } from "./Stores/useDomController"
-
-// THIS SHOULD BE IN A GLOBAL STATE BUT THEN IT BECOMES THE PROBLEM OF BEING AN INFINITE LOOP
-let domPosition = 0
-
-function getNewDomPosition() {
-  const newDomPos = domPosition
-  domPosition++
-  return newDomPos
-}
+import useBadDomController from "./useBadDomController"
 
 export default function useDeckCards( initialDeck : DeckTest, initialAtributes : GameDeckAtributes, deckId : string ) {
   // const { getNewDomPosition } = useDomController()
+  const { getNewDomPosition } = useBadDomController()
   
   const deck = useRef<DeckTest>(initialDeck)
   const topCard = useRef<CardInHand | null>({
@@ -21,10 +13,12 @@ export default function useDeckCards( initialDeck : DeckTest, initialAtributes :
     posX: initialAtributes.offsetX,
     posY: initialAtributes.offsetY,
     domPos: getNewDomPosition(),
-    // domPos: 0,
     tilt: 0,
+    rotation: 180,
+    scale: 1,
     zInd: 0,
-    active: false
+    active: false,
+    inUse: false
   })
 
   const loadNextCard = () => {
@@ -43,10 +37,17 @@ export default function useDeckCards( initialDeck : DeckTest, initialAtributes :
       posY: initialAtributes.offsetY,
       domPos: getNewDomPosition(),
       tilt: 0,
+      rotation: 180,
+      scale: 1,
       zInd: 0,
-      active: false
+      active: false,
+      inUse: false
     }
   }
 
-  return { topCard : topCard.current, loadNextCard }
+  const reloadTopCardDom = () => {
+    if (topCard.current) topCard.current.domPos = getNewDomPosition()
+  }
+
+  return { topCard : topCard.current, loadNextCard, reloadTopCardDom }
 }

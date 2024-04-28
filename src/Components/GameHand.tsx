@@ -5,7 +5,8 @@ import useDeckCards from "../Hooks/useDeckCards";
 import { deckTest, deckTest2 } from "../Utils/DeckTest";
 import GameDeck from "./GameDeck";
 import { CARD_ASPECT_RATIO } from "../Utils/Utils";
-import { useDomController } from "../Hooks/Stores/useDomController";
+import useBadDomController from "../Hooks/useBadDomController";
+import { ReactElement } from "react";
 
 interface propTypes {
   initialNumberOfCards? : number;
@@ -22,18 +23,44 @@ export default function GameHand({
   // initialNumberOfCards = 11,
   maxCardsInHand = 7,
   maxDegrees = 30,
-  maxOffsetY = -2,
+  maxOffsetY = -3,
   cardContainerLenght = 4.5,
   cardsContainerGap = 0.5,
   cardGrowthRespectContainer = 2,
   bottom = 4
 } : propTypes) {
-  const { handleDragStart, handleDragOver, handleDrop, addNewCard, addNewCardLeft, changeCardState, discard, recoverCard, cardList, cardMoving, currentIndex, discardedCards } = useHandCards({maxDegrees, maxOffsetY, offsetByCard : cardContainerLenght + cardsContainerGap, maxCardsInHand, discardedCardsY : bottom + (cardContainerLenght * cardGrowthRespectContainer + CARD_ASPECT_RATIO) * 0.9})
-  const { loadNextCard, topCard } = useDeckCards( deckTest, { offsetX : 40, offsetY : 0 }, "deck1" )
-  const { loadNextCard: loadNextCard2, topCard: topCard2 } = useDeckCards( deckTest2, { offsetX : -40, offsetY : 0 }, "deck2" )
-  const { domCounter } = useDomController()
+  const { 
+    handleDragStart, 
+    handleDragOver, 
+    handleDrop, 
+    addNewCard, 
+    addNewCardLeft, 
+    changeCardState, 
+    discard, 
+    recoverCard, 
+    deleteCards, 
+    prepareCard,
+    cardList, 
+    cardMoving, 
+    currentIndex, 
+    discardedCards,
+    usingCard 
+  } = useHandCards(
+    {
+      maxDegrees, 
+      maxOffsetY, 
+      offsetByCard : 
+      cardContainerLenght + cardsContainerGap, 
+      maxCardsInHand, 
+      discardedCardsY : bottom + (cardContainerLenght * cardGrowthRespectContainer + CARD_ASPECT_RATIO) * 0.9,
+      usingCardPos : { x : 40, y : 40 }
+    }
+  )
+  const { topCard, loadNextCard, reloadTopCardDom } = useDeckCards( deckTest, { offsetX : 40, offsetY : 0 }, "deck1" )
+  const { topCard: topCard2, loadNextCard: loadNextCard2, reloadTopCardDom: reloadTopCardDom2 } = useDeckCards( deckTest2, { offsetX : -40, offsetY : 0 }, "deck2" )
+  const { domCounter } = useBadDomController()
 
-  const cards = Array(domCounter + 1)
+  const cards = Array<ReactElement>(domCounter + 1)
   const backs = []
 
   const length = (cardList.length > maxCardsInHand) ? maxCardsInHand : cardList.length
@@ -68,15 +95,19 @@ export default function GameHand({
         onDragEnd={(e) => handleDrop(e)}
         style={{
           zIndex: cardList[i].zInd,
-          transform: `TranslateX(${cardList[i].posX}vw) TranslateY(${-cardList[i].posY}vw) RotateZ(${(cardList[i].isBeingDragged) ? 0 : cardList[i].tilt}deg)`,
+          transform: (cardList[i].inUse) 
+            ? `TranslateX(${cardList[i].posX}vw) TranslateY(${-cardList[i].posY}vh) RotateZ(${(cardList[i].isBeingDragged) ? 0 : cardList[i].tilt}deg) Scale(${cardList[i].scale})`
+            : `TranslateX(${cardList[i].posX}vw) TranslateY(${-cardList[i].posY}vw) RotateZ(${(cardList[i].isBeingDragged) ? 0 : cardList[i].tilt}deg) Scale(${cardList[i].scale})`,
         }}>
           <GameCard 
             card={cardList[i].card} 
             cardWidth={cardContainerLenght * cardGrowthRespectContainer} 
             active={cardList[i].active} 
+            rotation={cardList[i].rotation}
             onClick={ () => changeCardState(i) } 
+            handleUse={ () => prepareCard(i) }
             handleDiscard={ () => discard(i) }
-            disabled={(Math.abs(cardList[i].tilt) == 90)}
+            disabled={(Math.abs(cardList[i].tilt) == 90) || usingCard}
           />
       </div>
     );
@@ -92,7 +123,7 @@ export default function GameHand({
             zIndex: topCard.zInd,
             transform: `TranslateX(${topCard.posX}vw) TranslateY(${-topCard.posY}vw) RotateZ(${(topCard.isBeingDragged) ? 0 : topCard.tilt}deg)`,
           }}>
-            <GameCard card={topCard.card} cardWidth={cardContainerLenght * cardGrowthRespectContainer} rotation={180} />
+            <GameCard card={topCard.card} cardWidth={cardContainerLenght * cardGrowthRespectContainer} rotation={topCard.rotation} />
         </div>
     )
   }
@@ -106,7 +137,7 @@ export default function GameHand({
             zIndex: topCard2.zInd,
             transform: `TranslateX(${topCard2.posX}vw) TranslateY(${-topCard2.posY}vw) RotateZ(${(topCard2.isBeingDragged) ? 0 : topCard2.tilt}deg)`,
           }}>
-            <GameCard card={topCard2.card} cardWidth={cardContainerLenght * cardGrowthRespectContainer} rotation={180} />
+            <GameCard card={topCard2.card} cardWidth={cardContainerLenght * cardGrowthRespectContainer} rotation={topCard2.rotation} />
         </div>
     )
   }
@@ -132,14 +163,14 @@ export default function GameHand({
 
   // HANDLE NEW CARD
   const addCardToHand = () => {
-    if (topCard === null) return
+    if (topCard === null || usingCard) return
 
     addNewCard(topCard)
     loadNextCard()
   }
 
   const addCard2ToHand = () => {
-    if (topCard2 === null) return
+    if (topCard2 === null || usingCard) return
 
     addNewCardLeft(topCard2)
     loadNextCard2()
@@ -162,5 +193,12 @@ export default function GameHand({
       <GameDeck addCard={addCardToHand} offsetX={40} offsetY={0} deckWidth={cardContainerLenght * cardGrowthRespectContainer}/>
       <GameDeck addCard={addCard2ToHand} offsetX={-40} offsetY={0} deckWidth={cardContainerLenght * cardGrowthRespectContainer}/>
     </div>
+    <button 
+      className="GenericButton"
+      onClick={() => {
+        deleteCards()
+        reloadTopCardDom()
+        reloadTopCardDom2()
+      }}>Elimina las cartas descartadas</button>
   </>
 }
